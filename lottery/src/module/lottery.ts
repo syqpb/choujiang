@@ -1,23 +1,21 @@
-import { NormalPerson } from "./interface";
+import { NormalPerson, Winner } from "./interface";
+
+
 /**
  * @description 抽奖
  */
 export class Lottery {
   private laterPerson: NormalPerson[];
+  private splitPerson:SplitPerson;
+  private randomWinner:Winner;
 
   constructor(
     private totalPerson: NormalPerson[],
     private topTenPerson: NormalPerson[]
   ) {
-    this.laterPerson = this.getLasterPerson();
-  }
-  /**
-   * 
-   * @returns NormalPerson[]
-   * @description 得到 后续获奖人群
-   */
-  private getLasterPerson() {
-    return new SplitPerson(this.totalPerson, this.topTenPerson).laterPerson;
+    this.splitPerson = new SplitPerson(this.totalPerson, this.topTenPerson);
+    this.randomWinner = new RandomWinner();
+    this.laterPerson = this.splitPerson.laterPerson;
   }
   /**
    * 是否还有前十个未抽奖人群
@@ -58,9 +56,9 @@ export class Lottery {
     let pickPerson: NormalPerson;
     if (this.hasLasterPerson) {
       if (this.hasTopTenPerson) {
-        pickPerson = new RandomWinner(this.topTenPerson).pickOne();
+        pickPerson = this.randomWinner.pickOne(this.topTenPerson);
       } else {
-        pickPerson = new RandomWinner(this.laterPerson).pickOne();
+        pickPerson = this.randomWinner.pickOne(this.laterPerson);
       }
       this.decreaseById(pickPerson);
       return pickPerson;
@@ -71,11 +69,10 @@ export class Lottery {
 /**
  * @description 从randomWinners 随机选取
  */
-class RandomWinner {
-  constructor(private randomWinners: NormalPerson[]) {}
-  pickOne(): NormalPerson {
-    return this.randomWinners[
-      Math.floor(Math.random() * this.randomWinners.length)
+class RandomWinner implements Winner{
+  pickOne(randomWinners: NormalPerson[]): NormalPerson {
+    return randomWinners[
+      Math.floor(Math.random() *randomWinners.length)
     ];
   }
 }

@@ -6,3 +6,10 @@ export interface NormalPerson {
     name:string;
 }
 
+
+/**
+ * 选取中奖用户方法
+ */
+export interface Winner {
+    pickOne(randomWinners: NormalPerson[]):NormalPerson;
+}
